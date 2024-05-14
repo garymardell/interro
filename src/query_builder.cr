@@ -381,6 +381,12 @@ module Interro
           where: @where_clause
     end
 
+    protected def truncate
+      TruncateOperation.new(connection(CONFIG.write_db))
+        .call sql_table_name,
+          where: @where_clause
+    end
+
     protected def write_db
       connection(CONFIG.write_db)
     end

@@ -204,6 +204,28 @@ module Interro
     end
   end
 
+  struct TruncateOperation
+    def initialize(@queryable : DB::Database | DB::Connection)
+    end
+
+    def call(table_name : String, where : QueryExpression)
+      raise ScopedTruncateOperation.new("Invoked a TruncateOperation with WHERE clauses. Use a DeleteOperation to remove records instead.")
+    end
+
+    def call(table_name : String, where : Nil)
+      sql = String.build do |str|
+        str << "TRUNCATE TABLE " << table_name
+      end
+
+      @queryable
+        .exec(sql)
+        .rows_affected
+    end
+
+    class ScopedTruncateOperation < Exception
+    end
+  end
+
   class Exception < ::Exception
   end
 
